@@ -15,7 +15,11 @@ const initialData = [
 
 const PAGE_SIZE = 4;
 
-const sortData = (data, sortKey, direction) => {
+const sortData = (
+  data: { id: number; name: string; age: number }[],
+  sortKey: keyof { id: number; name: string; age: number },
+  direction: 'asc' | 'desc'
+) => {
   return [...data].sort((a, b) => {
     if (a[sortKey] < b[sortKey]) return direction === 'asc' ? -1 : 1;
     if (a[sortKey] > b[sortKey]) return direction === 'asc' ? 1 : -1;
@@ -25,14 +29,14 @@ const sortData = (data, sortKey, direction) => {
 
 export default function DataTable() {
   const [data, setData] = useState(initialData);
-  const [sortKey, setSortKey] = useState('id');
-  const [sortDir, setSortDir] = useState('asc');
+  const [sortKey, setSortKey] = useState<'id' | 'name' | 'age'>('id');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const [page, setPage] = useState(0);
 
   const sortedData = sortData(data, sortKey, sortDir);
   const pagedData = sortedData.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
-  const handleSort = (key) => {
+  const handleSort = (key: keyof { id: number; name: string; age: number }) => {
     if (sortKey === key) {
       setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
     } else {
@@ -88,7 +92,7 @@ export default function DataTable() {
             exit={{ opacity: 0, x: -40 }}
             transition={{ duration: 0.4 }}
           >
-            {pagedData.map((row) => (
+            {pagedData.map((row: { id: number; name: string; age: number }) => (
               <motion.tr
                 key={row.id}
                 whileHover={{ scale: 1.03, backgroundColor: '#f0f8ff' }}
