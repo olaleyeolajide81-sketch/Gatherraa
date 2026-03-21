@@ -1,5 +1,7 @@
 # Gatheraa Load Testing Framework
 
+> **⚠️ Important:** If you just cloned this repository, please read [REPOSITORY_CLEANUP_GUIDE.md](./docs/REPOSITORY_CLEANUP_GUIDE.md) for setup instructions.
+
 This directory contains the comprehensive load testing framework for Gatheraa, built with [k6](https://k6.io/). It is designed to simulate realistic user traffic, detect performance regressions, and help identify bottlenecks in the Payment and Notification services.
 
 ## Architecture

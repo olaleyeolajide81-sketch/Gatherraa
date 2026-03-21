@@ -1,102 +1,190 @@
-# Node modules
-*/node_modules/
-node_modules/
+################################################################################
+# Comprehensive .gitignore for monorepo (Frontend, Backend, Smart Contracts)  #
+################################################################################
 
-# Compilation output
-/dist
-/build
-/out
-
-# pnpm deploy output
-/bundle
-
-# Hardhat Build Artifacts
-/artifacts
-
-# Hardhat compilation (v2) support directory
-/cache
-
-# Typechain output
-/types
-
-# Hardhat coverage reports
-/coverage
-
-# Next.js output
-.next/
-.vercel/
-
-# Rust build artifacts
-**/target/
-
-# Rust test snapshots
-**/test_snapshots/
-
-# Database files
-*.sqlite
-*.db
-
-# WASM files
-*.wasm
-
-# Lock files - these should be regenerated
+# ============================================================================
+# PACKAGE MANAGERS - LOCK FILES (NEVER COMMIT)
+# ============================================================================
+# These should be regenerated during setup, not stored in version control
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
 Cargo.lock
 *.lock
 
-# IDE and editor files
+# ============================================================================
+# DEPENDENCIES - NODE MODULES
+# ============================================================================
+node_modules/
+*/node_modules/
+*/*/node_modules/
+app/backend/node_modules/
+app/frontend/node_modules/
+app/image-service/node_modules/
+contract/node_modules/
+tests/node_modules/
+
+# ============================================================================
+# BUILD AND COMPILATION OUTPUTS
+# ============================================================================
+# Frontend builds
+app/frontend/.next/
+app/frontend/dist/
+app/frontend/build/
+app/frontend/out/
+.vercel/
+
+# Backend builds
+app/backend/dist/
+app/backend/build/
+
+# Smart contract builds
+contract/artifacts/
+contract/cache/
+contract/dist/
+contract/build/
+contract/*/target/
+contract/typechain-types/
+typechain-types/
+
+# General build outputs
+/dist
+/build
+/out
+/bundle
+
+# ============================================================================
+# RUST BUILD ARTIFACTS
+# ============================================================================
+**/target/
+**/.cargo/
+Cargo.lock
+**/test_snapshots/
+
+# ============================================================================
+# IDE AND EDITOR FILES
+# ============================================================================
 .vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 .idea/
-*.sublime-workspace
 .project
 .classpath
 .c9/
+*.launch
+.settings/
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.editorconfig.local
 
-# OS files
+# ============================================================================
+# OS AND SYSTEM FILES
+# ============================================================================
 .DS_Store
-Thumbs.db
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
 ehthumbs.db
+Thumbs.db
+desktop.ini
 
-# Logs
+# ============================================================================
+# TESTING AND COVERAGE
+# ============================================================================
+coverage/
+.nyc_output/
+lcov.info
+*.lcov
+.jest-cache/
+test-results/
+.vitest/
+
+# ============================================================================
+# LOGS (NEVER COMMIT)
+# ============================================================================
 *.log
+logs/
+log/
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+*.out
 
-# Environment files
+# ============================================================================
+# ENVIRONMENT FILES (SECRETS - NEVER COMMIT)
+# ============================================================================
 .env
 .env.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
+.env.production
 .env.production.local
-.env*.local
+.env.*.local
+.env.vault
 
-# Temporary files
-.temp
-.tmp
-temp/
+# ============================================================================
+# TEMPORARY AND CACHE FILES
+# ============================================================================
+.temp/
+.tmp/
 tmp/
+temp/
+*.tmp
+*.bak
+*.backup
+*.swp
+*.swo
+*~
+.cache/
+.eslintcache
+.browserslistrc.cache
 
-# Testing
-.nyc_output
-*.lcov
-
-# Runtime data
-pids
+# ============================================================================
+# RUNTIME DATA AND DATABASES
+# ============================================================================
+pids/
 *.pid
 *.seed
 *.pid.lock
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
 
-# Diagnostic reports
+# ============================================================================
+# DIAGNOSTIC AND REPORTING
+# ============================================================================
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+dump.rdb
+perf-results/
 
-# Dependencies generated files
-.eslintcache
+# ============================================================================
+# VSCODE SPECIFIC
+# ============================================================================
+.vscode-test/
+.vscode-remote/
+
+# ============================================================================
+# GENERATED FILES
+# ============================================================================
+next-env.d.ts
+*.tsbuildinfo
+*.js.map
+*.ts.map
+
+# ============================================================================
+# DOCKER
+# ============================================================================
+.docker/
+docker.env
+
