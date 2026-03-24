@@ -22,6 +22,12 @@ pub enum DataKey {
     AntiSnipingConfig(Symbol),
     UpgradeTimelock,
     Version,
+    // Multi-source entropy keys
+    EntropyProvider(Address),
+    EntropySeed(Address, Symbol), // Seed from provider for specific tier
+    EntropyProviders(Symbol), // List of providers for a tier
+    VRFPublicKey, // Public key for verifying off-chain VRF proofs
+    VRFProof(Symbol), // Latest verified VRF proof for a tier
 }
 
 #[contracttype]
