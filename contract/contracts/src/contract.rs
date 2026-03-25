@@ -1,6 +1,6 @@
 use soroban_sdk::{contract, contractimpl, token, Address, BytesN, Env, Symbol};
 
-use crate::storage::*;
+use crate::storage::{StorageCache, *};
 use crate::types::{Config, DataKey, Tier, UserInfo};
 
 #[contract]
@@ -77,7 +77,15 @@ impl StakingContract {
 
         update_reward(&env, Some(&user));
 
-        let config = read_config(&env);
+        // Use StorageCache for efficient storage access
+        let mut cache = StorageCache::new();
+        let config = cache.get_config(&env).clone();
+        let tier = read_tier(&env, tier_id).unwrap_or(Tier {
+            min_amount: 0,
+            reward_multiplier: 100,
+        });
+        let mut total_shares = cache.get_total_shares(&env);
+        let reward_per_token_stored = cache.get_reward_per_token_stored(&env);
 
         // Transfer staking tokens from user to contract with error handling
         let token_client = token::Client::new(&env, &config.staking_token);
@@ -97,7 +105,7 @@ impl StakingContract {
         let mut user_info = read_user_info(&env, &user).unwrap_or(UserInfo {
             amount: 0,
             shares: 0,
-            reward_per_token_paid: read_reward_per_token_stored(&env),
+            reward_per_token_paid: reward_per_token_stored,
             rewards: 0,
             lock_start_time: 0,
             lock_duration: 0,
@@ -107,11 +115,7 @@ impl StakingContract {
         // Update amount
         user_info.amount += amount;
 
-        // Verify tier
-        let tier = read_tier(&env, tier_id).unwrap_or(Tier {
-            min_amount: 0,
-            reward_multiplier: 100,
-        });
+        // Verify tier (using cached tier)
         if user_info.amount < tier.min_amount {
             env.storage().instance().remove(&REENTRANCY_GUARD);
             panic!("insufficient amount for tier");
@@ -134,8 +138,9 @@ impl StakingContract {
 
         write_user_info(&env, &user, &user_info);
 
-        let mut total_shares = read_total_shares(&env);
+        // Update cached total_shares and write once
         total_shares += diff_shares;
+        cache.set_total_shares(total_shares);
         write_total_shares(&env, total_shares);
 
         env.storage().instance().remove(&REENTRANCY_GUARD);
@@ -152,6 +157,10 @@ impl StakingContract {
         user.require_auth();
         update_reward(&env, Some(&user));
 
+        // Cache frequently accessed storage values
+        let config = read_config(&env);
+        let mut total_shares = read_total_shares(&env);
+
         let mut user_info = read_user_info(&env, &user).expect("user not found");
         let reward = user_info.rewards;
 
@@ -159,7 +168,6 @@ impl StakingContract {
             user_info.rewards = 0;
             write_user_info(&env, &user, &user_info);
 
-            let config = read_config(&env);
             let reward_token = token::Client::new(&env, &config.reward_token);
 
             if compound {
@@ -171,6 +179,7 @@ impl StakingContract {
                 }
 
                 // Keep the reward in contract, just update shares and total shares
+                // Cache tier read
                 let tier = read_tier(&env, user_info.tier_id).unwrap_or(Tier {
                     min_amount: 0,
                     reward_multiplier: 100,
@@ -185,7 +194,7 @@ impl StakingContract {
                 user_info.shares = new_shares;
                 write_user_info(&env, &user, &user_info);
 
-                let mut total_shares = read_total_shares(&env);
+                // Update cached total_shares and write once
                 total_shares += diff_shares;
                 write_total_shares(&env, total_shares);
             } else {
@@ -221,6 +230,10 @@ impl StakingContract {
 
         update_reward(&env, Some(&user));
 
+        // Cache frequently accessed storage values
+        let config = read_config(&env);
+        let mut total_shares = read_total_shares(&env);
+
         let mut user_info = read_user_info(&env, &user).expect("user not found");
         if user_info.amount < amount {
             env.storage().instance().remove(&REENTRANCY_GUARD);
@@ -238,12 +251,9 @@ impl StakingContract {
             // Penalty remains in contract or burned, here we just don't send it to the user.
         }
 
-        let config = read_config(&env);
-
         user_info.amount -= amount;
 
-        // Re-calculate shares
-        // If they drop below tier min, should degrade tier? For simplicity, keep tier multiplier on remaining or fail if below min.
+        // Cache tier reads to avoid redundant storage access
         let tier = read_tier(&env, user_info.tier_id).unwrap_or(Tier {
             min_amount: 0,
             reward_multiplier: 100,
@@ -266,7 +276,7 @@ impl StakingContract {
 
         write_user_info(&env, &user, &user_info);
 
-        let mut total_shares = read_total_shares(&env);
+        // Update cached total_shares and write once
         total_shares -= diff_shares;
         write_total_shares(&env, total_shares);
 
@@ -294,6 +304,9 @@ impl StakingContract {
 
         update_reward(&env, Some(&user));
 
+        // Cache frequently accessed storage values
+        let mut total_shares = read_total_shares(&env);
+
         let mut user_info = read_user_info(&env, &user).expect("user not found");
         if user_info.amount < amount {
             panic!("slash amount exceeds balance");
@@ -301,6 +314,7 @@ impl StakingContract {
 
         user_info.amount -= amount;
 
+        // Cache tier reads to avoid redundant storage access
         let tier = read_tier(&env, user_info.tier_id).unwrap_or(Tier {
             min_amount: 0,
             reward_multiplier: 100,
@@ -322,7 +336,7 @@ impl StakingContract {
 
         write_user_info(&env, &user, &user_info);
 
-        let mut total_shares = read_total_shares(&env);
+        // Update cached total_shares and write once
         total_shares -= diff_shares;
         write_total_shares(&env, total_shares);
 
