@@ -28,7 +28,10 @@ pub enum DataKey {
     EntropyProviders(Symbol), // List of providers for a tier
     VRFPublicKey, // Public key for verifying off-chain VRF proofs
     VRFProof(Symbol), // Latest verified VRF proof for a tier
-    Role(Symbol, Address),
+    ContractConfig, // Proxy contract configuration
+    TokenName,
+    TokenSymbol,
+    TokenURI,
 }
 
 #[contracttype]
@@ -147,4 +150,14 @@ pub enum TicketError {
     TimelockNotExpired = 14,
     InvalidVersion = 15,
     ArithmeticError = 16,
+}
+
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TicketContractConfig {
+    pub admin: Address,
+    pub pricing_contract: Address,
+    pub allocation_contract: Address,
+    pub vrf_contract: Address,
+    pub commitment_contract: Address,
 }

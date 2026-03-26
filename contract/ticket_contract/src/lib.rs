@@ -32,6 +32,12 @@ use allocation::{
 mod entropy;
 use entropy::{EntropyManager, EntropySource, EntropyState};
 
+mod proxy;
+mod pricing_engine;
+mod allocation_engine;
+mod upgrade_manager;
+mod core;
+
 // Dynamic pricing constants
 const PRICE_INCREASE_BPS: i128 = 500; // 5% increase per tier threshold
 const EARLY_BIRD_DISCOUNT_BPS: i128 = 1000; // 10% discount max
