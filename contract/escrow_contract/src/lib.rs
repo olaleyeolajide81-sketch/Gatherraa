@@ -8,6 +8,8 @@
 
 #[cfg(test)]
 mod test;
+#[cfg(test)]
+mod security_tests;
 
 #[cfg(test)]
 mod test_gas;
