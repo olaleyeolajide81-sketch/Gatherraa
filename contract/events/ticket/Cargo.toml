@@ -2,7 +2,7 @@
 name = "gathera-events-ticket"
 version = "0.1.0"
 edition = "2021"
-description = "Event ticketing contracts for Gatheraa platform"
+description = "Events for Gatheraa platform"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
