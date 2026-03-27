@@ -59,3 +59,16 @@ pub fn execute_upgrade(env: &Env, new_wasm_hash: BytesN<32>) {
 
     env.events().publish((Symbol::new(env, "Upgraded"),), new_wasm_hash);
 }
+
+/// Reads the current version from storage.
+pub fn read_version(env: &Env) -> u32 {
+    env.storage()
+        .instance()
+        .get(&CommonDataKey::Version)
+        .unwrap_or(1)
+}
+
+/// Writes a new version to storage.
+pub fn write_version(env: &Env, version: u32) {
+    env.storage().instance().set(&CommonDataKey::Version, &version);
+}

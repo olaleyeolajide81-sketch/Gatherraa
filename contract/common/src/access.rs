@@ -70,3 +70,21 @@ pub fn require_role(env: &Env, role: Symbol, address: Address) {
         panic!("not authorized");
     }
 }
+
+/// Requires that the caller is the administrator with a specific admin address check.
+pub fn require_admin_with_address(env: &Env, admin: &Address) {
+    let stored_admin = read_admin(env).unwrap_or_else(|| panic!("admin not set"));
+    if stored_admin != *admin {
+        panic!("not authorized");
+    }
+    admin.require_auth();
+}
+
+/// Requires that the caller is the administrator with a specific admin address.
+pub fn require_admin(env: &Env, admin: &Address) {
+    let stored_admin = read_admin(env).unwrap_or_else(|| panic!("admin not set"));
+    if stored_admin != *admin {
+        panic!("not authorized");
+    }
+    admin.require_auth();
+}
