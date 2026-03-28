@@ -77,7 +77,7 @@ jobs:
       if: success()
       uses: codecov/codecov-action@v4
       with:
-        file: tests/integration/coverage.json
+        file: tests/integration/coverage/coverage.json
         flags: integration-tests
         name: Integration Tests Coverage
         fail_ci_if_error: false
